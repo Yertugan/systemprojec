@@ -39,7 +39,7 @@ char* get_cpu_model ()
 	match = strstr (buffer, "model name"); 
 	if (match == NULL)  return 0; 
 	/* Parse the line to extract the clock speed. */ 
-	sscanf (match, "cpu MHz : %s", &model_name);
+	sscanf (match, "cpu model : %s", &model_name);
 	return model_name;
 }
 
