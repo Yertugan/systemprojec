@@ -23,73 +23,190 @@
 
 MODULE_LICENSE("GPL");
 
-/*static char* file = NULL;
-module_param( file, charp, 0 );
+int cpureq, ramreq;
+char uploadReq[300], downloadReq[300];
+char myUpload[1000], myDownload[1000];
+char modelreq[300];
 
-#define BUF_LEN 255
-#define DEFNAME "/Desktop/project/requirements.txt"; // txt file
-static char buff[ BUF_LEN + 1 ];
-
-*/
-
-
-
-/*
-static int __init kread_init(void) {
-	
+int mycpuhz;
+char* mymodel;
+int myram;
+void get_requirements_speed(void)
+{
 	struct file *f;
-	size_t n;
-	if( file != NULL ) strcpy( buff, file );
-	printk( "*** openning file: %s\n", buff );
-	f = filp_open( DEFNAME, O_RDONLY, 0 );
+	mm_segment_t fs;
+	loff_t offset;
+	offset = 0;
+	char secret[300];
 
-	if( IS_ERR( f ) ) {
-		printk( "*** file open failed: %s\n", buff );
-		return -ENOENT;
-	}
-
-	n = kernel_read( f, 0, buff, 1);
-	if( n ) {
-		printk( "*** read first %ld bytes:\n", n );
-		buff[ n ] = '\0';
-		printk( "%s\n", buff );
-	} else {
-		printk( "*** kernel_read failed\n" );
-		return -EIO;
-	}
-
-	printk( "*** close file\n" );
-	filp_close( f, NULL );
-	return -EPERM;
-}*/
-
-/*int get_requirements(void){
-	char file_name[FILE_NAME_LEN];
-	char buffer[BUFFER_LEN];
-	char* match;
-	int raminfo;
-	sprintf(file_name, "~/Desktop/project/reqiurements.txt");
-	struct file *f = filp_open(file_name, O_RDONLY, 0 );
-	if(IS_ERR(f)){
-		printk(KERN_INFO "Error reading file");
-		return -1;
-	}
-	mm_segment_t fs = get_fs();
+	f = filp_open("/home/yertugan/Desktop/project/requirements.txt",O_RDWR | O_CREAT,0644);
+	fs = get_fs();
 	set_fs(get_ds());
-	f->f_op->read(f, buffer, BUFFER_LEN, &f->f_pos);
+	vfs_read(f, secret, 300, &offset);
+	
 	set_fs(fs);
-
-	match = strstr (buffer, "CPU"); 
+	//filp_close(f,NULL);
+	//printk(KERN_ALERT "read: %s\n",secret);
+	char* match;
+	
+	
+	match = strstr (secret, "speed"); 
 	if (match == NULL)  return 0;
-	sscanf (match, "CPU : %d", &raminfo);
-
+	sscanf (match, "speed : %d", &cpureq);
 	
 	filp_close(f, NULL);
-	return raminfo;
-}*/
+	
+}
 
-int myram;
-int get_memory_usage(void){
+void get_requirements_ram(void)
+{
+	struct file *f;
+	mm_segment_t fs;
+	loff_t offset;
+	offset = 0;
+	char secret[300];
+
+	f = filp_open("/home/yertugan/Desktop/project/requirements.txt",O_RDWR | O_CREAT,0644);
+	fs = get_fs();
+	set_fs(get_ds());
+	vfs_read(f, secret, 300, &offset);
+	
+	set_fs(fs);
+	//filp_close(f,NULL);
+	//printk(KERN_ALERT "read: %s\n",secret);
+	char* match;
+	match = strstr (secret, "RAM"); 
+	if (match == NULL)  return 0;
+	sscanf (match, "RAM : %d", &ramreq);
+	
+	filp_close(f, NULL);
+	
+}
+void get_req_upload_speed(void)
+{
+    
+    struct file *f;
+    mm_segment_t fs;
+    loff_t offset;
+    offset = 0;
+    char secret[300];
+    
+    f = filp_open("/home/yertugan/Desktop/project/requirements.txt",O_RDWR | O_CREAT,0644);
+    fs = get_fs();
+    set_fs(get_ds());
+    vfs_read(f, secret, 300, &offset);
+    
+    set_fs(fs);
+   // filp_close(f,NULL);
+    //printk(KERN_ALERT "read: %s\n",secret);
+    char* match;
+    match = strstr (secret, "Upload");
+    if (match == NULL)  return 0;
+    sscanf (match, "Upload: %s", &uploadReq);
+    filp_close(f, NULL);
+}
+void get_req_download_speed(void)
+{
+    struct file *f;
+    mm_segment_t fs;
+    loff_t offset;
+    offset = 0;
+    char secret[300];
+    
+    f = filp_open("/home/yertugan/Desktop/project/requirements.txt",O_RDWR | O_CREAT,0644);
+    fs = get_fs();
+    set_fs(get_ds());
+    vfs_read(f, secret, 300, &offset);
+    
+    set_fs(fs);
+    //filp_close(f,NULL);
+    //printk(KERN_ALERT "read: %s\n",secret);
+    char* match;
+    match = strstr (secret, "Download");
+    if (match == NULL)  return 0;
+    sscanf (match, "Download: %s", &downloadReq);
+    filp_close(f, NULL);
+}
+
+
+void get_my_upload_speed(void)
+{
+    
+    struct file *f;
+    mm_segment_t fs;
+    loff_t offset;
+    offset = 0;
+    char secret[1000];
+    
+    f = filp_open("/home/yertugan/Desktop/project/upload.txt",O_RDWR | O_CREAT,0644);
+    fs = get_fs();
+    set_fs(get_ds());
+    vfs_read(f, secret, 1000, &offset);
+    
+    set_fs(fs);
+    //filp_close(f,NULL);
+    //printk(KERN_ALERT "read: %s\n",secret);
+    char* match;
+    match = strstr (secret, "Upload");
+    if (match == NULL)  return 0;
+    sscanf (match, "Upload: %s", &myUpload);
+    filp_close(f, NULL);
+}
+void get_my_download_speed(void)
+{
+    struct file *f;
+    mm_segment_t fs;
+    loff_t offset;
+    offset = 0;
+    char secret[1000];
+    
+    f = filp_open("/home/yertugan/Desktop/project/download.txt",O_RDWR | O_CREAT,0644);
+    fs = get_fs();
+    set_fs(get_ds());
+    vfs_read(f, secret, 1000, &offset);
+    
+    set_fs(fs);
+    //filp_close(f,NULL);
+    //printk(KERN_ALERT "read: %s\n",secret);
+    char* match;
+    match = strstr (secret, "Download");
+    if (match == NULL)  return 0;
+    sscanf (match, "Download: %s", &myDownload);
+   	filp_close(f, NULL);
+}
+
+
+void get_requirements_model(void)
+{
+	struct file *f;
+	mm_segment_t fs;
+	loff_t offset;
+	offset = 0;
+	char secret[300];
+	
+	f = filp_open("/home/yertugan/Desktop/project/requirements.txt",O_RDWR | O_CREAT,0644);
+	fs = get_fs();
+	set_fs(get_ds());
+
+
+	vfs_read(f, secret, 300, &offset);
+	
+	set_fs(fs);
+	filp_close(f,NULL);
+	
+	char* match;
+	match = strstr (secret, "model"); 
+	if (match == NULL)  return 0;
+	sscanf (match, "model : %s", modelreq);
+	
+	//filp_close(f, NULL);
+	
+	
+}
+
+
+int get_memory_usage(void)
+{
 	char file_name[FILE_NAME_LEN];
 	char buffer[BUFFER_LEN];
 	char* match;
@@ -117,8 +234,7 @@ int get_memory_usage(void){
 	return raminfo;
 }
 
-int mycpuhz;
-char* mymodel;
+
 
 int get_mycpuspeed(void)
 {
@@ -170,68 +286,64 @@ char* get_mymodel(void)
 	filp_close(f, NULL);
 	return model;
 }
-/*
-int get_mydisk(void)
+
+
+static int __init k_init(void) 
 {
-	char file_name[FILE_NAME_LEN];
-	char buffer[BUFFER_LEN];
-	char* match;
-	int clock_speed;
-	sprintf(file_name, "/dev/sda1");
-	struct file *f = filp_open(file_name, O_RDONLY, 0 );
-	if(IS_ERR(f)){
-		printk(KERN_INFO "Error reading file");
-		return -1;
-	}
-	mm_segment_t fs = get_fs();
-	set_fs(get_ds());
-	f->f_op->read(f, buffer, BUFFER_LEN, &f->f_pos);
-	set_fs(fs);
-
-	
-
-	printk(KERN_INFO "test: %s", buffer);
-	//printk(KERN_INFO "%s", buffer);
-	filp_close(f, NULL);
-	return 0;
-}*/
-
-
-
-static int __init k_init(void) {
 	myram = get_memory_usage()/1024;
 	mycpuhz = get_mycpuspeed();
-	printk (KERN_INFO "My CPU: %dMhz\n", mycpuhz);
-	printk (KERN_INFO "My RAM: %dMb\n", myram);
+    
+	
 	mymodel = get_mymodel();
+	
 	printk (KERN_INFO "My process model: %s\n", mymodel);
-	int cpu = 2000;
-	int ram = 4096;
-	//int space = 20;
+   
+	get_my_download_speed();
+	
+	get_my_upload_speed();	
+	get_requirements_speed();
+	
+	get_requirements_ram();
+	
+	get_requirements_model();
 
-	char* n_model = "Intel(R)";
-	printk (KERN_INFO "Needed CPU: %dMhz\n", cpu);
-	printk (KERN_INFO "Needed RAM: %dMb\n", ram);
-	//printk (KERN_INFO "Needed Disc space: %dGb\n", space);
-	printk (KERN_INFO "Needed process model: %s\n", n_model);
-	//int require = get_requirements();
+	printk (KERN_INFO "Needed process model: %s\n", modelreq);
+	get_req_download_speed();
+	
+	get_req_upload_speed();
+	
+    
+    printk("            |CPU speed  |       | RAM     |     download speed     |     upload speed  |\n");
+    printk("Needed:     | %dMhz   |       | %dMB  |         %sMbit      |       %sMbit    |\n",cpureq, ramreq, downloadReq, uploadReq);
+    printk("------------|-----------|-------|---------|------------------------|-------------------|\n");
+    printk("Actual:     | %dMhz   |       | %dMB  |         %sMbit      |       %sMbit    |\n",mycpuhz, myram, myDownload, myUpload);
+
+    
+
+    
+	//get_mydisk();
+	//printk(KERN_INFO "read: %s\n",secret);
+	//int space = 20;
+////
+	///char* n_model = "Intel(R)";
+	//printk (KERN_INFO "Needed CPU: %dMhz\n", cpureq);
 	
 	//printk (KERN_INFO "test: %d\n", require);
-	if(mycpuhz>=cpu)
+	if(mycpuhz>=cpureq)
 	{
 		printk(KERN_INFO "Clock speed of cpu is enough\n");
 	}else{
 		printk(KERN_INFO "Clock speed of cpu is not enough\n");
 	}
 
-	if(myram>=ram)
+	if(myram>=ramreq)
 	{
 		printk(KERN_INFO "RAM is enough\n");
 	}else{
 		printk(KERN_INFO "RAM is not enough\n");
 	}
 
-	if(strcmp(n_model, mymodel)){
+	if(strcmp(modelreq, mymodel)){
 		printk(KERN_INFO "Process model is the same\n");
 	}else{
 		printk(KERN_INFO "Process model is different\n");

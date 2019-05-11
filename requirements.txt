@@ -1,3 +1,8 @@
-CPU
-RAM
-Memory
+model : Intel(R)
+speed : 3000 
+RAM : 8000
+Upload: 1.61 Mbit/s
+Download: 28.33 Mbit/s
+
+
+     
